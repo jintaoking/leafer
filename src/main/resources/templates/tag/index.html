@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tags</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- csrf -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+    <script src="/js/common.js"></script>
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/tag.css" />
+
+</head>
+<body>
+<!-- header -->
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container" style="margin-bottom: 100px">
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6">
+            <div class="tagcloud03">
+                <ul>
+                    <li th:each="tag : ${tags}">
+                        <a th:href="'/tag/' + ${tag.id}" th:inline="text">
+                            [[${tag.name}]]
+                            <span th:text="${#lists.size(tag.articles)}"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div><!-- container -->
+
+</body>
+</html>

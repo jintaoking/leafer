@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${article.title}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- csrf -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <!-- font awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+
+    <!-- simplemde -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css" />
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+    <!-- code syntax highlighting -->
+    <script src="https://cdn.jsdelivr.net/highlight.js/latest/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css" />
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- x-editable (bootstrap version) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+
+    <style>
+        .tagButton {
+            margin-right: 3px;
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1024px;
+            }
+        }
+        img {
+            max-width: 100%;
+            overflow: hidden;
+        }
+    </style>
+
+    <script src="/js/common.js"></script>
+    <script>
+        window.setInterval(function () {
+            $("#addTag").text("");
+            $("#tagBug").show();
+        }, 0);
+
+        $(document).ready(function () {
+
+            // https://github.com/NextStepWebs/simplemde-markdown-editor/
+            var simplemde = new SimpleMDE({
+                element: document.getElementById("articleBody"),
+                autofocus: false,
+                // forceSync: true,
+                hideIcons: ["guide"],
+                indentWithTabs: false,
+                tabSize: 4,
+                spellChecker: false,
+                renderingConfig: {
+                    singleLineBreaks: true,
+                    codeSyntaxHighlighting: true,
+                },
+                showIcons: ["code"],
+                status: false,
+            });
+
+            addTag();
+
+            $("#articleTitle").change(function () {
+                flag = true;
+            });
+
+            simplemde.codemirror.on("change", function () {
+                flag = true;
+            });
+
+            // directly use click event is not working
+            $(document.body).on('click', '.removeArticleTag' ,function(){
+                deleteArticleTag($("#articleId").val(), $(this).next().text());
+                $(this).parent().remove();
+            });
+
+            $("#saveArticle").click(function () {
+                $("#articleBody").text(simplemde.value());
+                if (flag) {
+                    updateArticle();
+                }
+                window.location.href = "/article/" + $("#articleId").val();
+            });
+
+            $("#articleDelete").click(function (event) {
+                if (confirm("Are you sure to delete?")) {
+                    articleDelete($("#articleId").text());
+                }
+            });
+
+            window.setInterval(function () {
+                $("#articleBody").text(simplemde.value());
+                updateArticle();
+            }, 20000);
+
+        });
+    </script>
+</head>
+<body>
+
+<!-- header -->
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container">
+
+    <div class="alert alert-success" id="success-alert" style="display: none;">
+        <strong>Saved Successfully!</strong>
+    </div>
+
+    <div class="col-sm-offset-1 col-sm-10">
+
+        <!-- tag -->
+        <div>
+            <!-- show tags -->
+            <button class="btn btn-default btn-sm tagButton" th:each="tag : ${tags}">
+                <!-- tag name -->
+                <a th:href="@{'/tag/' + ${tag.id}}" th:text="' ' + ${tag.name} + ' '"></a>
+
+                <!-- delete tag -->
+                <a class="removeArticleTag" href="#" >
+                    <span class="glyphicon glyphicon glyphicon-trash"></span>
+                </a><!-- delete tag -->
+
+                <!-- tag id -->
+                <span class="tagId" th:text="${tag.id}" hidden="hidden"></span>
+
+            </button><!-- show tags -->
+
+            <!-- add a new tag -->
+            <span id="tagBug" hidden="hidden">
+                <span style="border: none" id="addTag" class="glyphicon glyphicon-edit"></span>
+            </span><!-- add a new tag -->
+
+            <a id="saveArticle" class="glyphicon glyphicon-saved"
+               style="float: right; padding-left: 15px;"></a>
+            <a id="articleDelete" class="glyphicon glyphicon-trash"
+               style="float: right; padding-left: 15px;"></a>
+
+        </div><!-- tag -->
+
+        <!-- display article -->
+        <form id="articleForm" class="form-group" th:action="@{/article/modify}"
+              th:object="${article}" method="post">
+            <br/><input id="articleId" type="text" th:field="*{id}" hidden="hidden" placeholder="Title" />
+            <input id="articleTitle" class="form-control" type="text" th:field="*{title}" /><br/>
+            <textarea id="articleBody" th:text="${article.body}" th:field="*{body}"></textarea>
+            <br/>
+        </form><!-- display article -->
+
+    </div>
+
+</div>
+
+</body>
+</html>

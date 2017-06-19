@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${article.title}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- csrf -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- github markdown css -->
+    <link rel="stylesheet" href="/css/markdown.css" />
+    <!-- markdown parse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.min.js"></script>
+
+    <!-- code syntax highlighting -->
+    <script src="https://cdn.jsdelivr.net/highlight.js/latest/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css" />
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- static file -->
+    <script src="/js/common.js"></script>
+    <link rel="stylesheet" href="/css/base.css" />
+
+    <script>
+        $(document).ready(function () {
+            // markdown parse
+            var md = window.markdownit();
+            var result = md.render($("#body").text());
+            $("#body").html(result);
+
+            $("#articleDelete").click(function (event) {
+                if (confirm("Are you sure to delete?")) {
+                    articleDelete($("#articleId").text());
+                }
+            });
+
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 100) {
+                    $('#back-to-top').fadeIn();
+                } else {
+                    $('#back-to-top').fadeOut();
+                }
+            });
+
+            // scroll body to 0px on click
+            $('#back-to-top').click(function () {
+                $('#back-to-top').tooltip('hide');
+                $('body,html').animate({
+                    scrollTop: 0
+                }, 800);
+                return false;
+            });
+
+            $('#back-to-top').tooltip('show');
+        });
+    </script>
+
+</head>
+<body>
+
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container main">
+
+    <div class="row">
+    <div class="col-sm-10 col-sm-offset-1">
+
+        <!-- display article-->
+        <article class="markdown-body">
+            <!-- article id -->
+            <span id="articleId" th:text="${article.id}" hidden="hidden"></span>
+
+            <h1>
+                <!-- display article title -->
+                <span th:if="${article.title} == null">
+                    <span th:href="@{'/article/' + ${article.id}}">Untitled</span>
+                </span>
+                <span th:if="${article.title} == ''">
+                    <span th:href="@{'/article/' + ${article.id}}">Untitled</span>
+                </span>
+                <span th:if="${article.title} != null">
+                    <span th:href="@{'/article/' + ${article.id}}"
+                       th:text="${article.title}">Untitled</span>
+                </span><!-- display article title -->
+
+                <!-- delete -->
+                <small>
+                    <a id="articleDelete" role="menuitem" href="#"
+                       class="glyphicon glyphicon-trash" style="float: right; padding-left: 15px;"></a>
+                </small><!-- delete -->
+                <!-- edit -->
+                <small>
+                    <a th:href="@{'/article/modify/' + ${article.id}}"
+                       class="glyphicon glyphicon-pencil" style="float: right;"></a>
+                </small><!-- edit -->
+            </h1>
+
+            <!-- display article info -->
+            <div>
+                <!-- show tags -->
+                <tr th:each="tag : ${article.tags}">
+                    <a th:href="@{'/tag/' + ${tag.id}}" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-tag"></span><span th:text="' ' + ${tag.name}"></span>
+                    </a>
+                </tr><!-- show tags -->
+
+                <!-- display article created time -->
+                <span class="createdTime" th:text="${#dates.format(article.createdTime, 'yy-MM-dd HH:mm')}"></span>
+            </div><!-- display article info -->
+            <br/>
+
+            <!-- display aritcle body -->
+            <div th:text="${article.body}" id="body"></div>
+
+        </article><!-- display article -->
+
+    </div>
+    </div><!-- row -->
+
+    <a id="back-to-top" href="#" class="btn btn-default btn-md back-to-top" role="button"
+       data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span>
+    </a>
+
+</div><!-- container -->
+
+</body>
+</html>

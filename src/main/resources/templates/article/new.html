@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New article</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- font awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+    <!-- simplemde -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css" />
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+    <!-- code syntax highlighting -->
+    <script src="https://cdn.jsdelivr.net/highlight.js/latest/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css" />
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- x-editable (bootstrap version) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+
+    <!-- csrf -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <script src="/js/common.js"></script>
+    <script>
+        window.setInterval(function () {
+            $("#addTag").text("");
+            $("#tagBug").show();
+        }, 0);
+
+        $(document).ready(function () {
+            var simplemde = new SimpleMDE({
+                element: document.getElementById("demo"),
+                autofocus: false,
+                forceSync: true,
+                hideIcons: ["guide"],
+                indentWithTabs: false,
+                tabSize: 4,
+                spellChecker: false,
+                renderingConfig: {
+                    singleLineBreaks: true,
+                    codeSyntaxHighlighting: true,
+                },
+                showIcons: ["code"],
+                status: false,
+            });
+
+            addTag();
+
+            $("#articleTitle").change(function () {
+                flag = true;
+            });
+
+            simplemde.codemirror.on("change", function () {
+                flag = true;
+            });
+
+            $("#articleDelete").click(function (event) {
+                if (confirm("Are you sure to delete?")) {
+                    articleDelete($("#articleId").val());
+                }
+            });
+            
+            $("#articleSave").click(function (event) {
+                event.preventDefault();
+                $("#demo").text(simplemde.value());
+                if (flag) {
+                    updateArticle();
+                    window.location.href = "/article/" + $("#articleId").val();
+                } else {
+                    window.location.href = "/";
+                }
+            });
+
+            window.setInterval(function () {
+                $("#demo").text(simplemde.value());
+                updateArticle();
+            }, 20000);
+
+        });
+    </script>
+    <style>
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1024px;
+            }
+        }
+
+        img {
+            max-width: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container">
+
+    <div class="col-sm-offset-1 col-sm-10">
+
+        <!-- add a new tag -->
+        <span id="tagBug" hidden="hidden">
+            <span style="border: none" id="addTag" class="glyphicon glyphicon-edit"></span>
+
+            <a id="articleSave" class="glyphicon glyphicon-saved"
+               style="float: right; padding-left: 15px;"></a>
+            <a id="articleDelete" class="glyphicon glyphicon-trash"
+               style="float: right;"></a>
+        </span><br/><br/>
+
+
+        <!-- create or update a article -->
+        <form th:action="@{/article/update}" th:object="${article}" method="post"
+              id="articleForm" class="form-group">
+            <input id="articleId" type="text" th:field="*{id}" hidden="hidden" placeholder="Title" />
+            <input id="articleTitle" type="text" th:field="*{title}" class="form-control" /><br/>
+            <textarea  id="demo" th:field="*{body}"></textarea><br/>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

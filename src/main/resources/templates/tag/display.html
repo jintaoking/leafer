@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${tag.name}">Tag</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- csrf -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+    <script src="/js/common.js"></script>
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/tag.css" />
+
+    <script>
+        $(document).ready(function () {
+            $("#tagDelete").click(function () {
+                if (confirm("Are you sure to delete?")) {
+                    let tagId = $("#tagId").text();
+                    tagDelete(tagId);
+                }
+            });
+        });
+    </script>
+
+</head>
+<body>
+<!-- header -->
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container" style="margin-bottom: 100px">
+
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6">
+            <div class="tagcloud03">
+                <ul>
+                    <li th:each="tag : ${tags}">
+                        <a th:href="'/tag/' + ${tag.id}" th:inline="text">
+                            [[${tag.name}]]
+                            <span th:text="${#lists.size(tag.articles)}"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div><!-- tag cloud -->
+        </div>
+    </div><!-- row -->
+
+    <div class="row">
+        <div class="col-sm-offset-1 col-sm-10">
+
+            <!-- display a tag info -->
+            <div>
+                <!-- tag id -->
+                <span id="tagId" th:text="${tag.id}" style="display: none;"/>
+
+                <h4>
+                    <!-- tag name -->
+                    <span class="glyphicon glyphicon-tag"></span>
+                    <span th:text="${tag.name}"></span>
+                    <a href="#" class="glyphicon glyphicon-trash" style="float: right" id="tagDelete"></a>
+                    <!-- tag created time -->
+<!--                    <span class="tagCreatedTime" th:text="${#dates.format(tag.createdTime, 'yy-MM-dd HH:mm')}">
+                        created time
+                    </span>-->
+                </h4>
+
+            </div><!--display a tag info -->
+            <hr/>
+
+            <!-- display a article -->
+            <section th:each="article : ${tag.articles}" class="article">
+                <!-- article info -->
+                <div class="articleInfo">
+                    <!-- display article title -->
+                    <span th:if="${article.title} == null">
+                        <a class="articleTitle" th:href="@{'/article/' + ${article.id}}"
+                           target="_blank">Untitled</a>
+                    </span>
+                    <span th:if="${article.title} == ''">
+                        <a class="articleTitle" th:href="@{'/article/' + ${article.id}}"
+                           target="_blank">Untitled</a>
+                    </span>
+                    <span th:if="${article.title} != null">
+                        <a class="articleTitle" th:href="@{'/article/' + ${article.id}}"
+                           th:text="${article.title}" target="_blank">title</a>
+                    </span>
+
+                    <!-- article created time -->
+                    <span class="createdTime"
+                          th:text="${#dates.format(article.createdTime, 'yy-MM-dd HH:mm')}">
+                        created time
+                    </span>
+                </div><!-- article info -->
+
+                <!-- article body -->
+                <div th:if="${article.body != null}">
+                    <span th:if="${#strings.length(article.body) &lt; 100}">
+                        <div th:text="${article.body}" class="articleBody"></div>
+                    </span>
+                    <span th:if="${#strings.length(article.body).equals(100)}">
+                        <div th:text="${aritcle.body}" class="articleBody"></div>
+                    </span>
+                    <span th:if="${#strings.length(article.body) &gt; 100}">
+                        <div th:text="${#strings.substring(article.body, 0, 100) + '...'}" class="articleBody"></div>
+                    </span>
+                </div><!-- article body -->
+
+                <!-- article tag -->
+                <div style="margin-top: 10px">
+                    <tr th:each="tag : ${article.tags}">
+                        <a th:href="@{'/tag/' + ${tag.id}}" style="color: #888888;">
+                            # <span th:text="' ' + ${tag.name}"></span>&nbsp;&nbsp;
+                        </a>
+                    </tr>
+                </div><!-- article tag -->
+
+                <hr/>
+
+            </section><!-- display a article -->
+
+            <!-- delete tag button -->
+<!--            <div>
+                <button class="btn btn-default btn-sm center-block" id="tagDelete">Delete</button>
+            </div>-->
+        </div><!-- main -->
+
+    </div><!-- row -->
+
+</div><!-- container -->
+
+</body>
+</html>

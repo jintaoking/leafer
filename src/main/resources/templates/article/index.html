@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Index</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- csrf -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <!-- jquery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- static file -->
+    <script src="/js/common.js"></script>
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/sidebar.css"/>
+
+    <script>
+        $(document).ready(function () {
+
+            $(".next").click(function (event) {
+                let page = $(this).text();
+                paginationArticle(page);
+            });
+
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 100) {
+                    $('#back-to-top').fadeIn();
+                } else {
+                    $('#back-to-top').fadeOut();
+                }
+            });
+
+            // scroll body to 0px on click
+            $('#back-to-top').click(function () {
+                $('#back-to-top').tooltip('hide');
+                $('body,html').animate({
+                    scrollTop: 0
+                }, 800);
+                return false;
+            });
+
+            $('#back-to-top').tooltip('show');
+
+            getAllTags();
+
+        });
+    </script>
+
+</head>
+<body>
+
+<!-- header -->
+<div th:replace="fragments/header :: header"></div>
+<!-- sidebar -->
+<!--<div th:replace="fragments/sidebar :: sidebar"></div>-->
+
+<div class="container">
+
+        <div class="row">
+            <div class="col-sm-offset-1 col-sm-10" id="main">
+
+            <!-- display a article -->
+            <section th:each="article : ${articles}" class="article">
+                <!-- article info -->
+                <div class="articleInfo">
+                    <!-- display article title -->
+                    <span th:if="${article.title} == null">
+                        <a class="articleTitle" th:href="@{'/article/' + ${article.id}}">Untitled</a>
+                    </span>
+                    <span th:if="${article.title} == ''">
+                        <a class="articleTitle" th:href="@{'/article/' + ${article.id}}">Untitled</a>
+                    </span>
+                    <span th:if="${article.title} != null">
+                        <a class="articleTitle" th:href="@{'/article/' + ${article.id}}"
+                           th:text="${article.title}">Untitled</a>
+                    </span><!-- display article title -->
+
+                    <!-- article created time -->
+                    <span class="createdTime" style="margin-right: 10px;"
+                          th:text="${#dates.format(article.createdTime, 'yy-MM-dd HH:mm')}">
+                        created time
+                    </span><!-- article created time -->
+                </div><!-- article info -->
+
+                <!-- article body -->
+                <div th:if="${article.body != null}">
+                    <span th:if="${#strings.length(article.body) &lt; 100}">
+                        <div th:text="${article.body}" class="articleBody"></div>
+                    </span>
+                    <span th:if="${#strings.length(article.body).equals(100)}">
+                        <div th:text="${aritcle.body}" class="articleBody"></div>
+                    </span>
+                    <span th:if="${#strings.length(article.body) &gt; 100}">
+                        <div th:text="${#strings.substring(article.body, 0, 100) + '...'}" class="articleBody"></div>
+                    </span>
+                </div><!-- article body -->
+
+                <!-- article tags -->
+                <div style="margin-top: 10px">
+                    <tr th:each="tag : ${article.tags}">
+                        <span style="display: none;" th:text="${tag.id}"></span>
+                        <a href="#" class="changeTag"
+                           style="color: #888888;text-decoration: none;">
+                            # <span th:text="' ' + ${tag.name}"></span>&nbsp;&nbsp;
+                        </a>
+                    </tr>
+                </div><!-- article tags -->
+
+                <hr/>
+
+            </section><!-- display a article -->
+
+            </div>
+
+        </div><!-- row -->
+
+    <div class="row">
+
+        <div class="text-center">
+            <ul class="pagination" th:if="${articlesCount &gt; 10}">
+                <li th:each="i : ${#numbers.sequence(1, articlesCount/10+1)}">
+                    <a href="#" class="next" th:text="${i}"></a>
+                </li>
+            </ul>
+        </div>
+
+    </div><!-- row -->
+
+    <a id="back-to-top" href="#" class="btn btn-default btn-md back-to-top" role="button"
+       data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span>
+    </a>
+
+</div><!-- container -->
+
+</body>
+
+</html>
