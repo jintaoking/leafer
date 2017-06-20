@@ -47,5 +47,10 @@ p.s: 如果上面的部署过程中有任何的疑问欢迎在GitHub上反馈 ^_
 
 ![tag cloud](http://upload-images.jianshu.io/upload_images/4003106-e74d44b35880a883.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+## Contact
+
+GitHub: https://github.com/ziwenxie
+Blog: https://www.ziwenxie.site
+Email: ziwenxiecat@gmail.com
 
   [1]: https://github.com/ziwenxie/leafer
