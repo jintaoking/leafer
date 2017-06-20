@@ -68,5 +68,5 @@ CREATE TABLE `persistent_logins` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-INSERT INTO role(id, username, role) values(1, 'ADMIN', 'ROLE_ADMIN');
+INSERT INTO role(id, username, role) values(1, 'admin', 'ROLE_ADMIN');
 INSERT INTO user(id, username, password) VALUES(1, 'admin', '$2a$10$MDSRJE0SGzRWWMRdfZVq2.yfYOBQ8Y/6UMgONnmrzKMJbcB/Wi7i6');
